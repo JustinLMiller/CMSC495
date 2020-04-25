@@ -1,4 +1,4 @@
-# CMSC495
+# CMSC495 Group 4 Currency Coverter
 
 Justin Miller, Ayao Adanto, Brandon Tennyson, Mike Yacht
 
