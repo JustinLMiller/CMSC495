@@ -7,6 +7,7 @@ public class CurrencyConverter {
         try {
             CurrencyDB currDB = new CurrencyDB();
             ConversionModule convMod = new ConversionModule(currDB);
+            GUI g = new GUI(); // added line of code, 04/23/2020
             
             String toStr = "EUR";
             String fromStr = "USD";
