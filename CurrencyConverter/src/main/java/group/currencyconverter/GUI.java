@@ -61,7 +61,9 @@ public class GUI extends JFrame implements ActionListener {
                 public void keyPressed(KeyEvent e) {
                     from.setEditable(true); // this will allow for new values to be typed in if the previous value was not accepted
                     
-                    if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9' || e.getKeyChar() == '.' || e.getKeyCode() == 8) { // if values are numerical or decimal point or "backspace"
+                    if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9' || e.getKeyChar() == '.' ||
+                        e.getKeyCode() == 8 || e.getKeyCode() == 127 || e.getKeyCode() == 10 || 
+                        e.getKeyCode() == 37 || e.getKeyCode() == 39)  { // if values are numerical, decimal point,"backspace", "delete", or "enter"
                         
                         if (e.getKeyChar() == '.' && from.getText().contains(".")) {// restricts to only one decimal point by searching if there is one already
 
@@ -105,7 +107,9 @@ public class GUI extends JFrame implements ActionListener {
             date.setEditable(false);
 
         // finishing touches to the GUI
+
             convertButton.addActionListener(this);
+            
             frame.setTitle("Currency Converter");
             frame.setVisible(true);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
