@@ -27,6 +27,7 @@ public class GUI extends JFrame implements ActionListener {
 
     public GUI() {//creation of window an buttons etc
         try {
+            
             // create database object to populate the comboBox
             CurrencyDB currDB = new CurrencyDB();
             Date d = new java.util.Date(currDB.getLastUpdatedDate() * 1000L);
@@ -38,7 +39,8 @@ public class GUI extends JFrame implements ActionListener {
             //initilising the elements of the GUI
             convertButton= new JButton("Convert");
             frame = new JFrame();
-            from = new JFormattedTextField(createFormatter("####################"));
+            from = new JTextField();
+            
             to = new JTextField(16);
             date = new JTextField();
             toValue = new JComboBox(keys);
@@ -55,6 +57,25 @@ public class GUI extends JFrame implements ActionListener {
         //starting with first row
             frame.add(new JLabel("Starting currency: "));
             frame.add(from);
+            from.addKeyListener(new KeyAdapter() { // this allows for the textfield to only accept numerical values and only one decimal point
+                public void keyPressed(KeyEvent e) {
+                    from.setEditable(true); // this will allow for new values to be typed in if the previous value was not accepted
+                    
+                    if (e.getKeyChar() >= '0' && e.getKeyChar() <= '9' || e.getKeyChar() == '.' || e.getKeyCode() == 8) { // if values are numerical or decimal point or "backspace"
+                        
+                        if (e.getKeyChar() == '.' && from.getText().contains(".")) {// restricts to only one decimal point by searching if there is one already
+
+                            from.setEditable(false);// frevents character from being typed
+                            // joption pane?
+                        }else{     
+                        from.setEditable(true); // this allows for the value to be entered
+                        }
+                    } else {               
+            from.setEditable(false);
+            // joption pane?
+            }
+        }
+            });
             frame.add(fromValue);
             frame.add(fromLabel);
             //this action listener is to update the description of the currency key with what is selected in the combo box
@@ -98,7 +119,7 @@ public class GUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         //update the load date
         date.setText(loadDate);
-
+        from.setEditable(true); // this allows for the textbox to be modifiable again incase if the last value entered locked it
         //Here is where the conversion takes place
         try {
             // Need the database and converion objects to convert
@@ -121,16 +142,33 @@ public class GUI extends JFrame implements ActionListener {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+KeyListener listener = new KeyListener(){
+        @Override
+        public void keyTyped(KeyEvent e) {
+            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
 
-    private MaskFormatter createFormatter(String string) {
-    MaskFormatter formatter = null;
-    try {
-        formatter = new MaskFormatter(string);
-    }catch (java.text.ParseException exc) {
-        System.err.println("formatter is bad: " + exc.getMessage());
-        System.exit(-1);
-    }
-    return formatter;
-}
+        @Override
+        public void keyPressed(KeyEvent e) {
+            String val = from.getText();
+            if(e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && e.getKeyChar() == '.'){
+                for(int i=0; i< val.length(); i++){
+                if(val.charAt(i) == '.'){
+                from.setEditable(false);
+                // joption pane?
+                }else{
+                   e.consume(); 
+                }         
+                }
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+           // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    
+};
+
 
 }
