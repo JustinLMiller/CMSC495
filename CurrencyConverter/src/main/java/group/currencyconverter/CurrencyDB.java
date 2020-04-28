@@ -13,6 +13,9 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.json.simple.JSONObject;
@@ -22,7 +25,8 @@ import org.json.simple.parser.ParseException;
 
 public class CurrencyDB {
     
-    private HashMap codes, rates; 
+    private HashMap rates; 
+    private HashMap<String, String> codes;
     String JSONRates;
     long lastUpdatedDate;
     
@@ -35,7 +39,7 @@ public class CurrencyDB {
     // Constructor for the DB object.
     public CurrencyDB() throws Exception {
         // Initialize the two hashmaps.
-        codes = new HashMap();
+        codes = new HashMap<String, String>();
         rates = new HashMap();
         JSONRates = "";
         lastUpdatedDate = 0;
@@ -165,7 +169,7 @@ public class CurrencyDB {
             while((line=br.readLine()) != null) {
                String splitLine[] = line.split(",",2);
                // The replaceall strips any non alphanumerics to prevent wierd data issues
-               codes.put(splitLine[0].replaceAll("[^a-zA-Z0-9]", ""),splitLine[1]);
+               codes.put((String) splitLine[0].replaceAll("[^a-zA-Z0-9]", ""),(String) splitLine[1]);
             }
             
         } catch (IOException e) {
@@ -237,6 +241,19 @@ public class CurrencyDB {
     public String getCurrencyCodeDescription(String currencyCode) {
         return (String) codes.get(currencyCode);
     }
+    
+    public String getCurrencyCodeFromDescription(String currencyDesc) {
+        Set<Map.Entry<String, String>> mappingSet = codes.entrySet();
+        
+        for(Entry<String, String> entry : mappingSet) {
+            if(currencyDesc.equals(entry.getValue())) {
+                return entry.getKey();
+            } 
+        }
+        return null;
+    }
+        
+        
     
     // returns the timecode (seconds since 1/1/1970 00:00:00.000) for when the
     // rates were last updated.   This date comes out of the JSON.
