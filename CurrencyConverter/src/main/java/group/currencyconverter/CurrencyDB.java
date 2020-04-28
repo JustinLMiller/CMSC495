@@ -213,10 +213,13 @@ public class CurrencyDB {
     // This will pass back the conversion rate (normalized on USDs) for a given currency code.
     // input must be a 3-letter ISO code that exists in both codes and rates HashMaps.
     public double getConversionRate(String currency) {
-        // This has to be put in there because USD is the base, and any value in here ends up being an int and not a double.
-        if (currency.equals("USD")) return 1.0;
-        
-        return (Double) rates.get(currency);
+         // This weirdness is because the Hashmap sometimes stores the string values from the JSON as a
+         // Long (integer) instead of a Double (decimal).   So we convert it to a string first, then force
+         // It into a double.
+         String tempStr = rates.get(currency).toString();
+         Double tempDbl = new Double(tempStr);
+         
+         return tempDbl;
      
     }
     
