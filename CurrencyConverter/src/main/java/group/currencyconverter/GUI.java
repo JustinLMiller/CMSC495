@@ -1,5 +1,6 @@
 package group.currencyconverter;
 
+import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.*;
 import java.awt.GridLayout;
@@ -9,7 +10,7 @@ import java.util.Date;
 import javax.swing.JFrame;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.text.MaskFormatter;
+import javax.swing.plaf.ColorUIResource;
 
 public class GUI extends JFrame implements ActionListener {
     // these are the elemtns of the GUI
@@ -27,11 +28,11 @@ public class GUI extends JFrame implements ActionListener {
 
     public GUI() {//creation of window an buttons etc
         try {
-            
+            UIManager.put("TextField.inactiveBackground", new ColorUIResource(new Color(255, 255, 255)));
             // create database object to populate the comboBox
             CurrencyDB currDB = new CurrencyDB();
             Date d = new java.util.Date(currDB.getLastUpdatedDate() * 1000L);
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");  
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");  
             loadDate = dateFormat.format(d);
             
             String[] keys = currDB.getAllCurrencyCodes();
@@ -68,15 +69,21 @@ public class GUI extends JFrame implements ActionListener {
                         if (e.getKeyChar() == '.' && from.getText().contains(".")) {// restricts to only one decimal point by searching if there is one already
 
                             from.setEditable(false);// frevents character from being typed
-                            // joption pane?
-                        }else{     
+                            JOptionPane.showMessageDialog(frame,
+                                    "only one decimal point is allowed",
+                                    "User error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        } else {
                         from.setEditable(true); // this allows for the value to be entered
                         }
                     } else {               
-            from.setEditable(false);
-            // joption pane?
-            }
-        }
+                        from.setEditable(false);
+                        JOptionPane.showMessageDialog(frame,
+                                "only numerical values are allowed",
+                                "User error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             });
             frame.add(fromValue);
             frame.add(fromLabel);
@@ -112,10 +119,13 @@ public class GUI extends JFrame implements ActionListener {
             
             frame.setTitle("Currency Converter");
             frame.setVisible(true);
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+            frame.addWindowListener(new WindowAdapter() {//---------------------------------added lines of code 
+                public void windowClosing(WindowEvent we) {
+                    System.exit(0);
+                }
+            });
+            frame.setResizable(false);
         } catch (Exception ex) {
-// to be done later
         }
     }
 
@@ -138,41 +148,13 @@ public class GUI extends JFrame implements ActionListener {
             //just converts the textbox value to a double
             double x = Double.parseDouble(from.getText());
             //update the rate for the user to see
-            rate.setText("Test Rate: " + Double.toString(testRate));
+            rate.setText("Test Rate: " + String.format("%.2f", testRate));
             //apply the converted value to the unmodifable textbox for the user to see
-            to.setText(Double.toString(x * testRate));
+            to.setText (String.format("%.2f", (x * testRate)));
 
         } catch (Exception ex) { // auto generated
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-KeyListener listener = new KeyListener(){
-        @Override
-        public void keyTyped(KeyEvent e) {
-            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            String val = from.getText();
-            if(e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && e.getKeyChar() == '.'){
-                for(int i=0; i< val.length(); i++){
-                if(val.charAt(i) == '.'){
-                from.setEditable(false);
-                // joption pane?
-                }else{
-                   e.consume(); 
-                }         
-                }
-            }
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-           // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-    
-};
-
 
 }
