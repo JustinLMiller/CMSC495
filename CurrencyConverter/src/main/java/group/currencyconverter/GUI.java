@@ -25,6 +25,8 @@ public class GUI extends JFrame implements ActionListener {
     JLabel rate;
     JComboBox toValue;
     JComboBox fromValue;
+    String[] keys;
+
 
     public GUI() {//creation of window an buttons etc
         try {
@@ -35,7 +37,13 @@ public class GUI extends JFrame implements ActionListener {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");  
             loadDate = dateFormat.format(d);
             
-            String[] keys = currDB.getAllCurrencyCodes();
+            keys = currDB.getAllCurrencyCodes();
+            
+                    String description[] = new String[keys.length];
+        for(int i =0; i < keys.length; i++){
+            description[i] = currDB.getCurrencyCodeDescription(keys[i].toString()) ;
+                    }
+        
             
             //initilising the elements of the GUI
             convertButton= new JButton("Convert");
@@ -44,11 +52,16 @@ public class GUI extends JFrame implements ActionListener {
             
             to = new JTextField(16);
             date = new JTextField();
-            toValue = new JComboBox(keys);
-            fromValue = new JComboBox(keys);
+            toValue = new JComboBox(description);
+            fromValue = new JComboBox(description);
+            
+            //Sets the from value to USD and to value to EUR by default.
+            toValue.setSelectedItem(currDB.getCurrencyCodeDescription("EUR"));
+            fromValue.setSelectedItem(currDB.getCurrencyCodeDescription("USD"));
+            
             rate = new JLabel("Test Rate: ");
-            fromLabel = new JLabel(currDB.getCurrencyCodeDescription(fromValue.getSelectedItem().toString()));
-            toLabel = new JLabel(currDB.getCurrencyCodeDescription(toValue.getSelectedItem().toString()));
+            fromLabel = new JLabel(currDB.getCurrencyCodeFromDescription(fromValue.getSelectedItem().toString()));
+            toLabel = new JLabel(currDB.getCurrencyCodeFromDescription(toValue.getSelectedItem().toString()));
 
             //set the frame layout to grid for simplicity
             GridLayout grid = new GridLayout(3, 3);
@@ -91,7 +104,7 @@ public class GUI extends JFrame implements ActionListener {
             fromValue.addActionListener(
                     new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    fromLabel.setText(currDB.getCurrencyCodeDescription(fromValue.getSelectedItem().toString()));
+                    fromLabel.setText(currDB.getCurrencyCodeFromDescription(fromValue.getSelectedItem().toString()));
                 }});
 
         //second row
@@ -103,7 +116,7 @@ public class GUI extends JFrame implements ActionListener {
             toValue.addActionListener(
                     new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    toLabel.setText(currDB.getCurrencyCodeDescription(toValue.getSelectedItem().toString()));
+                    toLabel.setText(currDB.getCurrencyCodeFromDescription(toValue.getSelectedItem().toString()));
                 }});
             
         //third row
@@ -116,7 +129,13 @@ public class GUI extends JFrame implements ActionListener {
         // finishing touches to the GUI
 
             convertButton.addActionListener(this);
-            
+                                        JOptionPane.showMessageDialog(frame,
+                                              "Welcome to Currency Converter!\n"
+                                            + "Please start by selecting your starting and ending currency.\n"
+                                            + "Then input the amount you would like to convert.\n"
+                                            + "However only numerical values are allowed and only one decimal point.",
+                                    "Info",
+                                    JOptionPane.INFORMATION_MESSAGE);
             frame.setTitle("Currency Converter");
             frame.setVisible(true);
             frame.addWindowListener(new WindowAdapter() {//---------------------------------added lines of code 
@@ -131,7 +150,23 @@ public class GUI extends JFrame implements ActionListener {
 
     // this is where the GUI does stuff
     public void actionPerformed(ActionEvent event) {
-        //update the load date
+        // last test for input values
+            String[] a = from.getText().split("[.]");
+            String decimal = a[1];        
+        if(from.getText().equals("") || 0.00 == Double.parseDouble(from.getText())){ // if nothing is entered or if value is equal to 0
+            JOptionPane.showMessageDialog(frame,
+            "Please enter a value greater than 0.00",
+            "User error",
+            JOptionPane.ERROR_MESSAGE);
+        }else
+            if(from.getText().contains(".") && decimal.length() > 2){ // if value has too many digits after the decimal point
+            JOptionPane.showMessageDialog(frame,
+            "Please enter a value with only 2 digits after decimal point",
+            "User error",
+            JOptionPane.ERROR_MESSAGE);
+            }
+        else{
+                //update the load date
         date.setText(loadDate);
         from.setEditable(true); // this allows for the textbox to be modifiable again incase if the last value entered locked it
         //Here is where the conversion takes place
@@ -140,10 +175,9 @@ public class GUI extends JFrame implements ActionListener {
             CurrencyDB currDB = new CurrencyDB();
             ConversionModule convMod = new ConversionModule(currDB);
             
-            //Until the code hashmap is reversed this next line will be this long.
             //find the rate of the two values
-            double testRate = convMod.convertCurrency(fromValue.getSelectedItem().toString(),
-                                                      toValue.getSelectedItem().toString());
+            double testRate = convMod.convertCurrency(fromLabel.getText(),
+                                                      toLabel.getText());
             
             //just converts the textbox value to a double
             double x = Double.parseDouble(from.getText());
@@ -155,6 +189,6 @@ public class GUI extends JFrame implements ActionListener {
         } catch (Exception ex) { // auto generated
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
+    
+        }}    
 }
