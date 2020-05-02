@@ -10,6 +10,7 @@ import java.util.Date;
 import javax.swing.JFrame;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.swing.plaf.ColorUIResource;
 
 public class GUI extends JFrame implements ActionListener {
@@ -51,12 +52,14 @@ public class GUI extends JFrame implements ActionListener {
 
     // This populates the boxes from the hashmap
     private void populateBoxes() {
+        String temp;
         keys = currDB.getAllCurrencyCodes();
         description = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
             description[i] = currDB.getCurrencyCodeDescription(keys[i].toString());
         }
+        description = Stream.of(description).sorted().toArray(String[]::new);
     }
 
     // initilising the elements of the GUI
