@@ -88,7 +88,7 @@ public class GUI extends JFrame implements ActionListener {
 
         date = new JTextField();
         date.setEditable(false);
-        rate = new JLabel("Test Rate: ");
+        rate = new JLabel("Exchange Rate: ");
 
         convertButton = new JButton("Convert");
         convertButton.addActionListener(this);
